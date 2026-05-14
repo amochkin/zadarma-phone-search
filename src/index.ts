@@ -142,8 +142,7 @@ async function main() {
 
     const mask = alphaMask ? alphaPhraseToPhoneMask(alphaMask) : numericMask;
 
-
-    if (!country) {
+    if (!country || !mask) {
         throw new Error(
             [
                 "Usage:",
