@@ -2,6 +2,7 @@
 
 import * as crypto from "crypto";
 import { configDotenv } from "dotenv";
+import {alphaPhraseToPhoneMask, debug, getArg, getFlag, getNumberArg, log, requireEnv, sleep} from "./helpers.js";
 
 configDotenv({ quiet: true });
 
@@ -43,54 +44,6 @@ type OutputRow = {
     direction_name: string;
 };
 
-function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function getArg(name: string): string | undefined {
-    const prefix = `--${name}=`;
-    const arg = process.argv.find((a) => a.startsWith(prefix));
-    return arg?.slice(prefix.length);
-}
-
-function getNumberArg(name: string, defaultValue: number): number {
-    const value = getArg(name);
-    if (value === undefined) {
-        return defaultValue;
-    }
-
-    const parsed = Number(value);
-
-    if (!Number.isFinite(parsed) || parsed < 0) {
-        throw new Error(`Invalid --${name}. Expected a non-negative number.`);
-    }
-
-    return parsed;
-}
-
-function getFlag(name: string): boolean {
-    return process.argv.includes(`--${name}`);
-}
-
-const isVerbose = () => getFlag("verbose");
-
-function log(message: string): void {
-    console.error(`[zadarma] ${message}`);
-}
-
-function debug(message: string): void {
-    if (isVerbose()) {
-        console.error(`[zadarma:debug] ${message}`);
-    }
-}
-
-function requireEnv(name: string): string {
-    const value = process.env[name];
-    if (!value) {
-        throw new Error(`Missing required environment variable: ${name}`);
-    }
-    return value;
-}
 
 /**
  * Equivalent to PHP http_build_query(..., PHP_QUERY_RFC1738):
@@ -175,11 +128,20 @@ async function main() {
     const apiSecret = requireEnv("ZADARMA_SECRET");
 
     const country = getArg("country");
-    const mask = getArg("mask") ?? "";
     const language = getArg("language") ?? "en";
     const onlyDirectionId = getArg("direction-id");
     const exitOnFind = getFlag("exit-on-find");
     const delayMs = getNumberArg("delay-ms", 600);
+
+    const numericMask = getArg("mask") ?? "";
+    const alphaMask = getArg("alpha-mask");
+
+    if (numericMask && alphaMask) {
+        throw new Error("Use either --mask or --alpha-mask, not both.");
+    }
+
+    const mask = alphaMask ? alphaPhraseToPhoneMask(alphaMask) : numericMask;
+
 
     if (!country) {
         throw new Error(
@@ -192,6 +154,7 @@ async function main() {
                 "  --direction-id=13755",
                 "  --exit-on-find",
                 "  --delay-ms=500",
+                "  --alpha-mask=FLOWERS",
                 "  --verbose",
             ].join("\n")
         );
@@ -203,6 +166,7 @@ async function main() {
             `country=${country.toUpperCase()}`,
             `language=${language}`,
             `mask=${mask || "(none)"}`,
+            `alpha_mask=${alphaMask || "(none)"}`,
             `direction_id=${onlyDirectionId || "(all)"}`,
             `exit_on_find=${exitOnFind ? "yes" : "no"}`,
             `delay_ms=${delayMs}`,
