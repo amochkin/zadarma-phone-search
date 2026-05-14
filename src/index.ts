@@ -179,7 +179,7 @@ async function main() {
     const language = getArg("language") ?? "en";
     const onlyDirectionId = getArg("direction-id");
     const exitOnFind = getFlag("exit-on-find");
-    const delayMs = getNumberArg("delay-ms", 500);
+    const delayMs = getNumberArg("delay-ms", 600);
 
     if (!country) {
         throw new Error(

@@ -49,5 +49,6 @@ pnpm exec tsx src/index.ts --country=GB --mask=207
 | `--direction-id=<id>` | Restricts the search to a single Zadarma direction/city ID instead of searching all directions in the country.          | Not set / all directions |
 | `--verbose`           | Enables request-level debug logs, including request paths and response timing.                                          |                  `false` |
 | `--exit-on-find`      | Stops searching after the first direction that returns one or more available numbers.                                   |                  `false` |
-| `--delay-ms=<number>` | Adds a delay in milliseconds between direction availability requests to reduce request rate. Example: `500`.            |                    `500` |
+| `--delay-ms=<number>` | Adds a delay in milliseconds between direction availability requests to reduce request rate. Example: `1000`.           |                    `600` |
 
+> Note: Zadarma API has rate limits = 100 requests per minute. Use `--delay-ms` to avoid hitting the limit when searching through many directions.
