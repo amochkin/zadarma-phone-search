@@ -1,0 +1,27 @@
+{
+  "name": "zadarma-phone-search",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.0.4",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "dotenv": "^17.4.2",
+    "pnpm": "^11.1.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
